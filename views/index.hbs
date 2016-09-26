@@ -1,5 +1,5 @@
-<{{#if !user}}
+{{#if !user}}
   <h4>Welcome please log in</h4>
   {{else}}
-  <h2>Hello, this.user.displayName</h2>
+  <h2>Hello, {{this.user.displayName}}</h2>
 {{/if}}

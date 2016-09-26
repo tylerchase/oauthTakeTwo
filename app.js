@@ -9,6 +9,8 @@ var app = express()
   , session          = require( 'express-session' )
   , RedisStore       = require( 'connect-redis' )( session )
   , GoogleStrategy   = require( 'passport-google-oauth2' ).Strategy;
+  var favicon = require('serve-favicon');
+  var logger = require('morgan');
 
 // API Access link for creating client ID and secret:
 // https://code.google.com/apis/console/
@@ -44,7 +46,7 @@ passport.use(new GoogleStrategy({
     //then edit your /etc/hosts local file to point on your private IP.
     //Also both sign-in button + callbackURL has to be share the same url, otherwise two cookies will be created and lead to lost your session
     //if you use it.
-    callbackURL: "https://authtaketwo.herokuapp.com/account",
+    callbackURL: "http://localhost:3000/auth/google/callback",
     passReqToCallback   : true
   },
   function(request, accessToken, refreshToken, profile, done) {
@@ -88,7 +90,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
+  res.json(req.body);
 });
 
 app.get('/login', function(req, res){
@@ -102,7 +104,7 @@ app.get('/login', function(req, res){
 //   will redirect the user back to this application at /auth/google/callback
 app.get('/auth/google', passport.authenticate('google', { scope: [
        'https://www.googleapis.com/auth/plus.login',
-       'https://www.googleapis.com/auth/plus.profile.emails.read']
+       'https://www.googleapis.com/auth/plus.profile.emails.read', 'profile', 'email']
 }));
 
 // GET /auth/google/callback
@@ -132,7 +134,7 @@ app.get('/logout', function(req, res){
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login');
+  res.redirect('/account');
 }
 
 
@@ -140,8 +142,6 @@ function ensureAuthenticated(req, res, next) {
 //
 // var express = require('express');
 // var path = require('path');
- var favicon = require('serve-favicon');
- var logger = require('morgan');
 // var cookieParser = require('cookie-parser');
 // var bodyParser = require('body-parser');
 //
